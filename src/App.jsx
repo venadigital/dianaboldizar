@@ -221,6 +221,7 @@ export default function App() {
         <video
           ref={heroVideoRef}
           className="hero-bg-video"
+          src="/media/video-hero.mp4"
           autoPlay
           muted
           loop
@@ -230,10 +231,7 @@ export default function App() {
           disablePictureInPicture
           aria-hidden="true"
           tabIndex="-1"
-        >
-          <source src="/media/video-hero-mobile.mp4" type="video/mp4" media="(max-width: 739px)" />
-          <source src="/media/video-hero.mp4" type="video/mp4" />
-        </video>
+        />
 
         <div className="hero-content shell">
           <nav className="top-nav" data-reveal>
