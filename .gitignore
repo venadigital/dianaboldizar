@@ -1,0 +1,9 @@
+node_modules
+dist
+.DS_Store
+
+# Archivos de trabajo usados para construir la landing, no necesarios en deploy.
+Contenido/
+Recursos/
+Sistema_de_diseño/
+Sistema_de_dise*/
