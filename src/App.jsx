@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import TextBlockAnimation from './components/TextBlockAnimation';
 import TextRotateBlock from './components/TextRotateBlock';
 
@@ -154,10 +154,21 @@ const structureText =
   'El proceso se organiza en cinco fases secuenciales. Cada una construye sobre la anterior y cierra con entregables concretos. El orden importa: no se define la oferta sin tener claridad sobre el público, y no se construye el sistema comercial sin tener la oferta lista.';
 
 export default function App() {
+  const heroVideoRef = useRef(null);
+
   useEffect(() => {
     window.scrollTo({ left: 0 });
     document.documentElement.scrollLeft = 0;
     document.body.scrollLeft = 0;
+
+    const heroVideo = heroVideoRef.current;
+    if (heroVideo) {
+      heroVideo.muted = true;
+      heroVideo.defaultMuted = true;
+      heroVideo.play().catch(() => {
+        // iOS can block autoplay in low-power mode; without controls it remains a clean visual frame.
+      });
+    }
 
     const observer = new IntersectionObserver(
       entries => {
@@ -180,7 +191,18 @@ export default function App() {
     <div className="page">
       <header className="hero" id="inicio">
         <div className="hero-overlay" />
-        <video className="hero-bg-video" src="/media/video-hero.mp4" autoPlay muted loop playsInline controls />
+        <video
+          ref={heroVideoRef}
+          className="hero-bg-video"
+          src="/media/video-hero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+          tabIndex="-1"
+        />
 
         <div className="hero-content shell">
           <nav className="top-nav" data-reveal>
