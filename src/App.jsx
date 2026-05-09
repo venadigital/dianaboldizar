@@ -161,13 +161,37 @@ export default function App() {
     document.documentElement.scrollLeft = 0;
     document.body.scrollLeft = 0;
 
+    let cleanupHeroVideo = () => {};
     const heroVideo = heroVideoRef.current;
     if (heroVideo) {
       heroVideo.muted = true;
       heroVideo.defaultMuted = true;
-      heroVideo.play().catch(() => {
-        // iOS can block autoplay in low-power mode; without controls it remains a clean visual frame.
-      });
+      heroVideo.setAttribute('muted', '');
+      heroVideo.setAttribute('playsinline', '');
+      heroVideo.setAttribute('webkit-playsinline', '');
+
+      const playHeroVideo = () => {
+        if (heroVideo.paused) {
+          heroVideo.play().catch(() => {
+            // iOS may delay autoplay until the first user gesture or when low-power mode is disabled.
+          });
+        }
+      };
+
+      playHeroVideo();
+      heroVideo.addEventListener('loadeddata', playHeroVideo);
+      heroVideo.addEventListener('canplay', playHeroVideo);
+      document.addEventListener('visibilitychange', playHeroVideo);
+      window.addEventListener('touchstart', playHeroVideo, { passive: true });
+      window.addEventListener('scroll', playHeroVideo, { passive: true });
+
+      cleanupHeroVideo = () => {
+        heroVideo.removeEventListener('loadeddata', playHeroVideo);
+        heroVideo.removeEventListener('canplay', playHeroVideo);
+        document.removeEventListener('visibilitychange', playHeroVideo);
+        window.removeEventListener('touchstart', playHeroVideo);
+        window.removeEventListener('scroll', playHeroVideo);
+      };
     }
 
     const observer = new IntersectionObserver(
@@ -184,7 +208,10 @@ export default function App() {
     const targets = document.querySelectorAll('[data-reveal]');
     targets.forEach(target => observer.observe(target));
 
-    return () => observer.disconnect();
+    return () => {
+      cleanupHeroVideo();
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -194,15 +221,19 @@ export default function App() {
         <video
           ref={heroVideoRef}
           className="hero-bg-video"
-          src="/media/video-hero.mp4"
           autoPlay
           muted
           loop
           playsInline
+          webkit-playsinline="true"
           preload="auto"
+          disablePictureInPicture
           aria-hidden="true"
           tabIndex="-1"
-        />
+        >
+          <source src="/media/video-hero-mobile.mp4" type="video/mp4" media="(max-width: 739px)" />
+          <source src="/media/video-hero.mp4" type="video/mp4" />
+        </video>
 
         <div className="hero-content shell">
           <nav className="top-nav" data-reveal>
